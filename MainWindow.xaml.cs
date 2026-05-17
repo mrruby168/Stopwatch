@@ -15,11 +15,18 @@ namespace StopwatchApp
         public MainWindow()
         {
             InitializeComponent();
+
+            this.Loaded += (s, e) =>
+            {
+                this.Activate();
+                this.Focus();
+            };
+
             _timer.Interval = TimeSpan.FromMilliseconds(50);
             _timer.Tick += Timer_Tick;
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void Timer_Tick(object? sender, EventArgs e)
         {
             UpdateDisplay(_stopwatch.Elapsed);
         }
@@ -37,7 +44,6 @@ namespace StopwatchApp
             {
                 _stopwatch.Stop();
                 _timer.Stop();
-                // Lưu kết quả
                 var elapsed = _stopwatch.Elapsed;
                 tbLastRecord.Text = $"{(int)elapsed.TotalHours:D2} : {elapsed.Minutes:D2} : {elapsed.Seconds:D2}";
                 btnStartStop.Content = "▶  Start";
