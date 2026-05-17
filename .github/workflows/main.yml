@@ -1,0 +1,49 @@
+name: Build Stopwatch EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Publish single EXE
+        run: >
+          dotnet publish Stopwatch.csproj
+          -c Release
+          -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -o ./publish
+
+      - name: Upload EXE as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Stopwatch-win-x64
+          path: ./publish/Stopwatch.exe
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: Stopwatch v1.0.${{ github.run_number }}
+          files: ./publish/Stopwatch.exe
+          body: |
+            ## Stopwatch WPF
+            Tải file `Stopwatch.exe` về chạy thẳng, không cần cài thêm gì.
+            **Yêu cầu:** Windows 10/11 x64
